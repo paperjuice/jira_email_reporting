@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+        margin-left: 50px;
+        padding-bottom: 200px;
+      }
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      ul {
+        margin: 0 auto;
+        height: 22px;
+      }
+      .important {
+        color: #FF2E2D;
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .stories {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="title">To: </span><% System.get_env("EMAIL") %>
+    </br>
+    </br>
+    <span class="title">Subject: </span><%= title %>
+    </br>
+    </br>
+----------------------------------------------------------------
+    </br>
+    </br>
+
+    <span class="title">Start:</span> <%= sprint_start %> - <span class="title">End:</span> <%= sprint_end %>
+    </br>
+    </br>
+
+    <span class="title">Sprint Goal:</span> <%= goal %>
+    </br>
+    </br>
+    </br>
+
+    <span class="title">List of completed stories:</span></br>
+    <div class="stories">
+      <%= for item <- completed_stories do %>
+        &bull; <a href=<%= item["story_link"] %>><%= item["story_key"] %></a> - <%= item["story_desc"] %>
+        <%= if item["epic_name"] != "No Epic" do %>
+          <b>|</b> <a href=<%= item["epic_link"] %>><%= item["epic_name"] %></a>
+        <% else %>
+          <b>|</b> <%= item["epic_name"] %>
+        <% end %>
+        <b>|</b> <%= item["story_status"] %></br>
+        </ul>
+      <% end %>
+    </div>
+    </br>
+
+    <span class="title">List of not completed stories:</span></br>
+    <div class="stories">
+      <%= if ongoing_stories != [] do %>
+        <%= for item <- ongoing_stories do %>
+          &bull; <a href=<%= item["story_link"] %>><%= item["story_key"] %></a> - <%= item["story_desc"] %>
+          <%= if item["epic_name"] != "No Epic" do %>
+            <b>|</b> <a href=<%= item["epic_link"] %>><%= item["epic_name"] %></a>
+          <% else %>
+            <b>|</b> <%= item["epic_name"] %>
+          <% end %>
+          <b>|</b> <%= item["story_status"] %><br>
+          </ul>
+        <% end %>
+      <% else %>
+        All stories were completed during the sprint.
+      <% end %>
+    </div>
+    </br>
+    </br>
+    </br>
+
+    <span class="title">Unforeseen Circumstances:</span></br>
+    No unforseen circumstances happened during the sprint.
+    </br>
+    </br>
+
+--------------------------------------------------
+    </br>
+    </br>
+<div class="important">PLEASE READ</div>
+<ul>
+  <li><b>Double check if everything is correct!</b> This might have more bugs than lines of code, I don't know.</li>
+  <li>Special symbols like euro sign are broken</li>
+  <li> Unforeseen Circumstances:- Any incidents impacting the sprint, illness or other unplanned work that affected the delivery.</li>
+</ul>
+  </body>
+</html>

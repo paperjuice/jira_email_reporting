@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+        margin-left: 50px;
+        padding-bottom: 200px;
+      }
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      ul {
+        margin: 0 auto;
+        height: 22px;
+      }
+      .important {
+        color: #FF2E2D;
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .stories {
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="title">To: </span><%= System.get_env("EMAIL") %>
+    </br>
+    </br>
+    <span class="title">Subject: </span><%= title %>
+    </br>
+    </br>
+--------------------------------------------------
+    </br>
+    </br>
+
+    <span class="title">Start:</span> <%= sprint_start %> - <span class="title">End:</span> <%= sprint_end %>
+    </br>
+    </br>
+
+    <span class="title">Sprint Goal:</span> <%= goal %>
+    </br>
+    </br>
+    </br>
+
+    <span class="title">List of committed stories:</span></br>
+    <div class="stories">
+      <%= for item <- issues do %>
+        &bull; <a href=<%= item["story_link"] %>><%= item["story_key"] %></a> - <%= item["story_desc"] %>
+        <%= if item["epic_name"] != "No Epic" do %>
+          | <a href=<%= item["epic_link"] %>><%= item["epic_name"] %></a></br>
+        <% else %>
+          | <%= item["epic_name"] %></br>
+        <% end %>
+      <% end %>
+    </div>
+    </br>
+    </br>
+
+    <span class="title">Capacity:</span>
+    </br>
+    All team members are available.
+    </br>
+    </br>
+
+    <span class="title">Risks:</span>
+    </br>
+    No known risks.
+    </br>
+    </br>
+    </br>
+
+--------------------------------------------------
+    </br>
+    </br>
+<div class="important">PLEASE READ</div>
+<ul>
+  <li><b>Double check if everything is correct!</b> This might have more bugs than lines of code, I don't know.</li>
+  <li>Special symbols like euro sign are broken</li>
+  <li>Capacity - How many days are the sprint and are there any holidays or vacancies affecting? Anything that would impact the velocity of the sprint. </li>
+  <li>Risks - How many days are the sprint and are there any holidays or vacancies affecting? Anything that would impact the velocity of the sprint </li>
+</ul>
+  </body>
+</html>
