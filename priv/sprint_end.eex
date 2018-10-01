@@ -26,7 +26,7 @@
     </style>
   </head>
   <body>
-    <span class="title">To: </span><% System.get_env("EMAIL") %>
+    <span class="title">To: </span><%= System.get_env("EMAIL") %>
     </br>
     </br>
     <span class="title">Subject: </span><%= title %>

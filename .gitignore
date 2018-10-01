@@ -25,3 +25,5 @@ mail_report-*.tar
 # Ignore secret ( ͡° ͜ʖ ͡°)
 a_dont_push/
 
+# Ignore vim temp files
+*.swp
