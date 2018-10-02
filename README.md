@@ -2,7 +2,7 @@
 
 ## Intro
 EmailReporting is a primitive tool for generating reports for beggining and ending of a sprint.
-This reports have a specific format and are supposed to be copied and pasted in an email which can be sent to people within the organisation.
+These reports have a specific format and are supposed to be copied and pasted in an email which can be sent to people within the organisation. The templates can be found under ```priv/```.
 
 ## Installation
 1. Clone the repo
