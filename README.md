@@ -12,10 +12,14 @@ These reports have a specific format and are supposed to be copied and pasted in
 ```
 BASE_URL="https://jira.atlassian.com"
 BASE_KEY_LINK="https://jira.atlassian.com/browse"
-AUTHORIZATION="base64.encode(username:password)"
+AUTHORIZATION="randomstring="
 EMAIL="first_last01@mail.com; first_last02@mail.com"
 ```
 BASE_URL is your organisation's JIRA
+
+AUTHORIZATION string can be generated from the Elixir interactive shell(```iex()>```) by running: 
+```Base.encode64("username:password")```
+
 The project uses the basic authorization method.
 
 3. Run
