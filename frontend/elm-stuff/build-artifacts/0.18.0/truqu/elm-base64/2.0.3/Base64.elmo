@@ -1,0 +1,2 @@
+var _truqu$elm_base64$Base64$decode = _truqu$elm_base64$Base64_Decode$decode;
+var _truqu$elm_base64$Base64$encode = _truqu$elm_base64$Base64_Encode$encode;

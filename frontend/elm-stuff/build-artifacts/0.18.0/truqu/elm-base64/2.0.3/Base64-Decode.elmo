@@ -1,0 +1,262 @@
+var _truqu$elm_base64$Base64_Decode$charToInt = function ($char) {
+	var _p0 = $char;
+	switch (_p0.valueOf()) {
+		case 'A':
+			return 0;
+		case 'B':
+			return 1;
+		case 'C':
+			return 2;
+		case 'D':
+			return 3;
+		case 'E':
+			return 4;
+		case 'F':
+			return 5;
+		case 'G':
+			return 6;
+		case 'H':
+			return 7;
+		case 'I':
+			return 8;
+		case 'J':
+			return 9;
+		case 'K':
+			return 10;
+		case 'L':
+			return 11;
+		case 'M':
+			return 12;
+		case 'N':
+			return 13;
+		case 'O':
+			return 14;
+		case 'P':
+			return 15;
+		case 'Q':
+			return 16;
+		case 'R':
+			return 17;
+		case 'S':
+			return 18;
+		case 'T':
+			return 19;
+		case 'U':
+			return 20;
+		case 'V':
+			return 21;
+		case 'W':
+			return 22;
+		case 'X':
+			return 23;
+		case 'Y':
+			return 24;
+		case 'Z':
+			return 25;
+		case 'a':
+			return 26;
+		case 'b':
+			return 27;
+		case 'c':
+			return 28;
+		case 'd':
+			return 29;
+		case 'e':
+			return 30;
+		case 'f':
+			return 31;
+		case 'g':
+			return 32;
+		case 'h':
+			return 33;
+		case 'i':
+			return 34;
+		case 'j':
+			return 35;
+		case 'k':
+			return 36;
+		case 'l':
+			return 37;
+		case 'm':
+			return 38;
+		case 'n':
+			return 39;
+		case 'o':
+			return 40;
+		case 'p':
+			return 41;
+		case 'q':
+			return 42;
+		case 'r':
+			return 43;
+		case 's':
+			return 44;
+		case 't':
+			return 45;
+		case 'u':
+			return 46;
+		case 'v':
+			return 47;
+		case 'w':
+			return 48;
+		case 'x':
+			return 49;
+		case 'y':
+			return 50;
+		case 'z':
+			return 51;
+		case '0':
+			return 52;
+		case '1':
+			return 53;
+		case '2':
+			return 54;
+		case '3':
+			return 55;
+		case '4':
+			return 56;
+		case '5':
+			return 57;
+		case '6':
+			return 58;
+		case '7':
+			return 59;
+		case '8':
+			return 60;
+		case '9':
+			return 61;
+		case '+':
+			return 62;
+		case '/':
+			return 63;
+		default:
+			return 0;
+	}
+};
+var _truqu$elm_base64$Base64_Decode$intToString = function ($int) {
+	if (_elm_lang$core$Native_Utils.cmp($int, 65536) < 1) {
+		return _elm_lang$core$String$fromChar(
+			_elm_lang$core$Char$fromCode($int));
+	} else {
+		var c = $int - 65536;
+		return _elm_lang$core$String$fromList(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Char$fromCode(55296 | (c >>> 10)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Char$fromCode(56320 | (1023 & c)),
+					_1: {ctor: '[]'}
+				}
+			});
+	}
+};
+var _truqu$elm_base64$Base64_Decode$add = F2(
+	function ($char, _p1) {
+		var _p2 = _p1;
+		var _p4 = _p2._2;
+		var _p3 = _p2._1;
+		var shiftAndAdd = function ($int) {
+			return (63 & $int) | (_p2._0 << 6);
+		};
+		return _elm_lang$core$Native_Utils.eq(_p3, 0) ? (_elm_lang$core$Native_Utils.eq(128 & $char, 0) ? {
+			ctor: '_Tuple3',
+			_0: 0,
+			_1: 0,
+			_2: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p4,
+				_truqu$elm_base64$Base64_Decode$intToString($char))
+		} : (_elm_lang$core$Native_Utils.eq(224 & $char, 192) ? {ctor: '_Tuple3', _0: 31 & $char, _1: 1, _2: _p4} : (_elm_lang$core$Native_Utils.eq(240 & $char, 224) ? {ctor: '_Tuple3', _0: 15 & $char, _1: 2, _2: _p4} : {ctor: '_Tuple3', _0: 7 & $char, _1: 3, _2: _p4}))) : (_elm_lang$core$Native_Utils.eq(_p3, 1) ? {
+			ctor: '_Tuple3',
+			_0: 0,
+			_1: 0,
+			_2: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p4,
+				_truqu$elm_base64$Base64_Decode$intToString(
+					shiftAndAdd($char)))
+		} : {
+			ctor: '_Tuple3',
+			_0: shiftAndAdd($char),
+			_1: _p3 - 1,
+			_2: _p4
+		});
+	});
+var _truqu$elm_base64$Base64_Decode$toUTF16 = F2(
+	function ($char, acc) {
+		return {
+			ctor: '_Tuple3',
+			_0: 0,
+			_1: 0,
+			_2: A2(
+				_truqu$elm_base64$Base64_Decode$add,
+				255 & ($char >>> 0),
+				A2(
+					_truqu$elm_base64$Base64_Decode$add,
+					255 & ($char >>> 8),
+					A2(_truqu$elm_base64$Base64_Decode$add, 255 & ($char >>> 16), acc)))
+		};
+	});
+var _truqu$elm_base64$Base64_Decode$chomp = F2(
+	function (char_, _p5) {
+		var _p6 = _p5;
+		var _p10 = _p6._2;
+		var _p9 = _p6._0;
+		var _p8 = _p6._1;
+		var $char = _truqu$elm_base64$Base64_Decode$charToInt(char_);
+		var _p7 = _p8;
+		if (_p7 === 3) {
+			return A2(_truqu$elm_base64$Base64_Decode$toUTF16, _p9 | $char, _p10);
+		} else {
+			return {ctor: '_Tuple3', _0: ($char << ((3 - _p8) * 6)) | _p9, _1: _p8 + 1, _2: _p10};
+		}
+	});
+var _truqu$elm_base64$Base64_Decode$initial = {
+	ctor: '_Tuple3',
+	_0: 0,
+	_1: 0,
+	_2: {ctor: '_Tuple3', _0: 0, _1: 0, _2: ''}
+};
+var _truqu$elm_base64$Base64_Decode$wrapUp = function (_p11) {
+	var _p12 = _p11;
+	return (_elm_lang$core$Native_Utils.cmp(_p12._2._1, 0) > 0) ? _elm_lang$core$Result$Err('Invalid UTF-16') : _elm_lang$core$Result$Ok(_p12._2._2);
+};
+var _truqu$elm_base64$Base64_Decode$stripNulls = F2(
+	function (input, output) {
+		return A2(_elm_lang$core$String$endsWith, '==', input) ? A2(_elm_lang$core$String$dropRight, 2, output) : (A2(_elm_lang$core$String$endsWith, '=', input) ? A2(_elm_lang$core$String$dropRight, 1, output) : output);
+	});
+var _truqu$elm_base64$Base64_Decode$validBase64Regex = _elm_lang$core$Regex$regex('^([A-Za-z0-9\\/+]{4})*([A-Za-z0-9\\/+]{2}[A-Za-z0-9\\/+=]{2})?$');
+var _truqu$elm_base64$Base64_Decode$validate = function (input) {
+	return A2(_elm_lang$core$Regex$contains, _truqu$elm_base64$Base64_Decode$validBase64Regex, input) ? _elm_lang$core$Result$Ok(input) : _elm_lang$core$Result$Err('Invalid base64');
+};
+var _truqu$elm_base64$Base64_Decode$pad = function (input) {
+	var _p13 = A2(
+		_elm_lang$core$Basics$rem,
+		_elm_lang$core$String$length(input),
+		4);
+	switch (_p13) {
+		case 3:
+			return A2(_elm_lang$core$Basics_ops['++'], input, '=');
+		case 2:
+			return A2(_elm_lang$core$Basics_ops['++'], input, '==');
+		default:
+			return input;
+	}
+};
+var _truqu$elm_base64$Base64_Decode$validateAndDecode = function (input) {
+	return A2(
+		_elm_lang$core$Result$map,
+		_truqu$elm_base64$Base64_Decode$stripNulls(input),
+		A2(
+			_elm_lang$core$Result$andThen,
+			function (_p14) {
+				return _truqu$elm_base64$Base64_Decode$wrapUp(
+					A3(_elm_lang$core$String$foldl, _truqu$elm_base64$Base64_Decode$chomp, _truqu$elm_base64$Base64_Decode$initial, _p14));
+			},
+			_truqu$elm_base64$Base64_Decode$validate(input)));
+};
+var _truqu$elm_base64$Base64_Decode$decode = function (_p15) {
+	return _truqu$elm_base64$Base64_Decode$validateAndDecode(
+		_truqu$elm_base64$Base64_Decode$pad(_p15));
+};
