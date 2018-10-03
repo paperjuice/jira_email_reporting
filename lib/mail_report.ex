@@ -155,8 +155,8 @@ defmodule EmailReport do
       issues: active_data
     ]
 
-    IO.inspect(result, label: Request)
-    EEx.eval_file("priv/sprint_start.eex", result)
+    #    IO.inspect(result, label: Request)
+    #    EEx.eval_file("priv/sprint_start.eex", result)
   end
 
   defp get_value(string, regex) do

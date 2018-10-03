@@ -1,0 +1,17 @@
+# elm-package generated files
+elm-stuff
+# elm-repl generated files
+repl-temp-*
+
+
+# mac directory config
+.DS_Store
+
+# vim temp files
+*.swp
+
+# design folder
+design
+
+#ignore compiler generated files
+*.js
