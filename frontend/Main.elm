@@ -132,9 +132,9 @@ update msg model =
 
     Decode result ->
       let
-          re = result |> Debug.log "Result"
+          response =
+          case result of
+            Ok json -> 
+            Error msg -> 
       in
       (model, Cmd.none)
-       --   ( {model | id = resp.id, name = resp.name, password = resp.password }
-       --   , Cmd.none
-       --   )
