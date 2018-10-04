@@ -91,7 +91,7 @@ defmodule EmailReport do
         %{
           "story_key" => issue["key"],
           "story_desc" => issue["fields"]["summary"],
-          "story_link" => @base_key_link <> "/#{story}",
+          "story_link" => @base_key_link <> "/#{issue["key"]}",
           "story_status" => translate_status(issue["fields"]["status"]["name"]),
           "epic_name" => issue["fields"]["customfield_13305"],
           "epic_link" => get_epic_link(issue["fields"]["customfield_10005"])
@@ -107,7 +107,7 @@ defmodule EmailReport do
         %{
           "story_key" => issue["key"],
           "story_desc" => issue["fields"]["summary"],
-          "story_link" => @base_key_link <> "/#{story}",
+          "story_link" => @base_key_link <> "/#{issue["key"]}",
           "story_status" => translate_status(issue["fields"]["status"]["name"]),
           "epic_name" => issue["fields"]["customfield_13305"],
           "epic_link" => get_epic_link(issue["fields"]["customfield_10005"])
