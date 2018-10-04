@@ -114,11 +114,13 @@ update msg model =
 
     Generate ->
       let
-          header = Http.header "Basic" model.base64_key
+          headers =
+            [ Http.header "Basic" model.base64_key
+            ]
 
           req = Http.request
             { method = "GET"
-            , headers = [header]
+            , headers = headers
             , url = url ++ model.storyKey
             , body = Http.emptyBody
             , expect = Http.expectString
@@ -134,7 +136,8 @@ update msg model =
       let
           response =
           case result of
-            Ok json -> 
-            Error msg -> 
+            Ok json -> json
+            Err msg -> toString(msg)
+          |> Debug.log "Response"
       in
       (model, Cmd.none)

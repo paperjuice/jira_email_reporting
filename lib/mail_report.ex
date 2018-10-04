@@ -146,14 +146,16 @@ defmodule EmailReport do
         }
       end)
 
-    result = [
+    result = %{
       title: "Sprint Start Report (#{get_date(start_date)}) - #{project_name}",
       project_name: project_name,
       sprint_start: start_date,
       sprint_end: end_date,
       goal: goal,
       issues: active_data
-    ]
+    }
+
+    Poison.encode!(result)
 
     #    IO.inspect(result, label: Request)
     #    EEx.eval_file("priv/sprint_start.eex", result)
