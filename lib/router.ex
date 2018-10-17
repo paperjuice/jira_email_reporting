@@ -6,10 +6,18 @@ defmodule EmailReport.Router do
   plug(:match)
   plug(:dispatch)
 
-  get "/email-report/:story" do
-    html_resp = EmailReport.send_request(story)
+  get "/" do
+    file = File.read!("frontend/index.html")
 
-    send_resp(conn, 200, html_resp)
+    send_resp(conn, 200, file)
+  end
+
+  get "/email-report/:story" do
+    IO.inspect(conn, label: NOICE)
+
+    html_resp = EmailReport.send_request(story)
+      conn
+      |> send_resp(200, html_resp)
   end
 
   match _ do

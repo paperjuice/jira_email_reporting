@@ -13,7 +13,7 @@ main =
   { init = init
   , update = update
   , view = view
-  , subscriptions = (\_-> Sub.none)
+  , subscriptions = subscriptions
   }
 
 url = "http://localhost:9999/email-report/"
@@ -65,10 +65,11 @@ type alias Model =
   , username : String
   , password : String
   , storyKey : String
+  , sprintStart : SprintStart
   }
 
 init =
-  (Model "" "" "" "", Cmd.none)
+  (Model "" "" "" "" (SprintStart "" "" "" "" "" []), Cmd.none)
 
 view model =
   case model.base64_key of
@@ -98,7 +99,7 @@ view model =
 update msg model =
   case msg of
     Username string ->
-      ({ model | username = string } |> Debug.log "hello", Cmd.none )
+      ({ model | username = string }, Cmd.none )
 
     Password string ->
       ({model | password = string }, Cmd.none )
@@ -128,16 +129,20 @@ update msg model =
             , withCredentials = False
             }
 
-          command = Http.send Decode req
+          command = Http.send Decode req |> Debug.log "hello"
       in
       (model, command)
 
     Decode result ->
       let
           response =
-          case result of
-            Ok json -> json
-            Err msg -> toString(msg)
-          |> Debug.log "Response"
+            case result of
+              Ok json -> json
+              Err msg -> toString(msg)
+
+          result =  
       in
       (model, Cmd.none)
+
+subscriptions model =
+  Sub.none
