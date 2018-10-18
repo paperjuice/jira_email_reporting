@@ -13,11 +13,16 @@ defmodule EmailReport.Router do
   end
 
   get "/email-report/:story" do
-    IO.inspect(conn, label: NOICE)
+    {_key, auth_key} =
+      Enum.find(conn.req_headers, fn {key, _value} ->
+        key == "basic"
+      end)
+      |> IO.inspect(label: AUTH_KEY)
 
-    html_resp = EmailReport.send_request(story)
-      conn
-      |> send_resp(200, html_resp)
+    html_resp = EmailReport.send_request(auth_key, story)
+
+    conn
+    |> send_resp(200, html_resp)
   end
 
   match _ do

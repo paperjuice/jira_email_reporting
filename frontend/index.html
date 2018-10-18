@@ -9835,13 +9835,79 @@ var _user$project$Main$sprintStartDecoder = A3(
 						'title',
 						_elm_lang$core$Json_Decode$string,
 						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$SprintStart)))))));
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {base64_key: a, username: b, password: c, storyKey: d, sprintStart: e};
+var _user$project$Main$SprintEnd = F7(
+	function (a, b, c, d, e, f, g) {
+		return {title: a, projectName: b, sprintStart: c, sprintEnd: d, goal: e, completedStories: f, ongoingStories: g};
+	});
+var _user$project$Main$CompletedStory = F6(
+	function (a, b, c, d, e, f) {
+		return {storyKey: a, storyDesc: b, storyLink: c, storyStatus: d, epicName: e, epicLink: f};
+	});
+var _user$project$Main$OngoingStory = F6(
+	function (a, b, c, d, e, f) {
+		return {storyKey: a, storyDesc: b, storyLink: c, storyStatus: d, epicName: e, epicLink: f};
+	});
+var _user$project$Main$storyDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'epic_link',
+	_elm_lang$core$Json_Decode$string,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'epic_name',
+		_elm_lang$core$Json_Decode$string,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'story_status',
+			_elm_lang$core$Json_Decode$string,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'story_link',
+				_elm_lang$core$Json_Decode$string,
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'story_desc',
+					_elm_lang$core$Json_Decode$string,
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'story_key',
+						_elm_lang$core$Json_Decode$string,
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$OngoingStory)))))));
+var _user$project$Main$sprintEndDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'ongoing_stories',
+	_elm_lang$core$Json_Decode$list(_user$project$Main$storyDecoder),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'completed_stories',
+		_elm_lang$core$Json_Decode$list(_user$project$Main$storyDecoder),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'goal',
+			_elm_lang$core$Json_Decode$string,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'sprint_end',
+				_elm_lang$core$Json_Decode$string,
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'sprint_start',
+					_elm_lang$core$Json_Decode$string,
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'project_name',
+						_elm_lang$core$Json_Decode$string,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'title',
+							_elm_lang$core$Json_Decode$string,
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$SprintEnd))))))));
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {base64_key: a, username: b, password: c, storyKey: d, sprintStart: e, sprintEnd: f};
 	});
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
-	_0: A5(
+	_0: A6(
 		_user$project$Main$Model,
 		'',
 		'',
@@ -9854,6 +9920,15 @@ var _user$project$Main$init = {
 			'',
 			'',
 			'',
+			{ctor: '[]'}),
+		A7(
+			_user$project$Main$SprintEnd,
+			'',
+			'',
+			'',
+			'',
+			'',
+			{ctor: '[]'},
 			{ctor: '[]'})),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
@@ -10098,11 +10173,15 @@ var _user$project$Main$update = F2(
 				var response = function () {
 					var _p2 = _p1._0;
 					if (_p2.ctor === 'Ok') {
-						return A2(_elm_lang$core$Debug$log, 'hello', _p2._0);
+						return _p2._0;
 					} else {
 						return _elm_lang$core$Basics$toString(_p2._0);
 					}
 				}();
+				var data = A2(
+					_elm_lang$core$Debug$log,
+					'data',
+					A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Main$sprintEndDecoder, response));
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});

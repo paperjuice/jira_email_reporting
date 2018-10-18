@@ -5,10 +5,10 @@ defmodule EmailReport do
 
   @base_url System.get_env("BASE_URL")
   @base_key_link System.get_env("BASE_KEY_LINK")
-  @authorization System.get_env("AUTHORIZATION")
+  #@authorization System.get_env("AUTHORIZATION")
 
-  def send_request(story) do
-    headers = [Authorization: "Basic #{@authorization}"]
+  def send_request(auth_key, story) do
+    headers = [Authorization: "Basic #{auth_key}"]
 
     [project, _] =
       story
@@ -35,7 +35,7 @@ defmodule EmailReport do
     end_date = get_value(last_sprint, ~r/endDate=[0-9-]+/)
     goal = get_value(last_sprint, ~r/goal=[\w\d\=\-\(\)\*\& ]+/i)
 
-    sprint_issue_list = get_sprint_data(project, id)
+    sprint_issue_list = get_sprint_data(project, id, auth_key)
 
     case state do
       "ACTIVE" ->
@@ -54,7 +54,7 @@ defmodule EmailReport do
           } | Goal: #{goal}."
         )
 
-        generate_closed(sprint_issue_list, story, project_name, start_date, end_date, goal)
+        generate_closed(sprint_issue_list, project_name, start_date, end_date, goal)
 
       unsupported ->
         IO.puts("Unsupported state: #{unsupported}. Contact whoever maintain this garbage.")
@@ -65,10 +65,10 @@ defmodule EmailReport do
   # PRIVATE
   # -----------------
 
-  defp get_sprint_data(project, sprint_id) do
+  defp get_sprint_data(project, sprint_id, auth_key) do
     url = @base_url <> "/rest/api/2/search?jql=project=#{project}%20AND%20Sprint=#{sprint_id}"
     # TODO: This is duplicate. Put it in one place
-    headers = [Authorization: "Basic #{@authorization}"]
+    headers = [Authorization: "Basic #{auth_key}"]
     resp = HTTPoison.get!(url, headers, [])
 
     Poison.decode!(resp.body)["issues"]
@@ -76,7 +76,6 @@ defmodule EmailReport do
 
   defp generate_closed(
          issues,
-         story,
          project_name,
          start_date,
          end_date,
@@ -114,18 +113,20 @@ defmodule EmailReport do
         }
       end)
 
-    result = [
-      title: "Sprint End Report (#{get_date(start_date)}) - #{project_name}",
-      project_name: project_name,
-      sprint_start: start_date,
-      sprint_end: end_date,
-      goal: goal,
-      completed_stories: completed_stories,
-      ongoing_stories: ongoing_stories
-    ]
+    result = %{
+      "title" => "Sprint End Report (#{get_date(start_date)}) - #{project_name}",
+      "project_name" => project_name,
+      "sprint_start" => start_date,
+      "sprint_end" => end_date,
+      "goal" => goal,
+      "completed_stories" => completed_stories,
+      "ongoing_stories" => ongoing_stories
+    }
 
-    IO.inspect(result, label: Request)
-    EEx.eval_file("priv/sprint_end.eex", result)
+    Poison.encode!(result)
+
+    #IO.inspect(result, label: Request)
+    #EEx.eval_file("priv/sprint_end.eex", result)
   end
 
   defp generate_active(
@@ -147,12 +148,12 @@ defmodule EmailReport do
       end)
 
     result = %{
-      title: "Sprint Start Report (#{get_date(start_date)}) - #{project_name}",
-      project_name: project_name,
-      sprint_start: start_date,
-      sprint_end: end_date,
-      goal: goal,
-      issues: active_data
+      "title" => "Sprint Start Report (#{get_date(start_date)}) - #{project_name}",
+      "project_name" => project_name,
+      "sprint_start" => start_date,
+      "sprint_end" => end_date,
+      "goal" => goal,
+      "issues" => active_data
     }
 
     Poison.encode!(result)
@@ -180,7 +181,6 @@ defmodule EmailReport do
   defp get_date(start_date) do
     [year, month, day] =
       String.split(start_date, "-")
-      |> IO.inspect(label: DATE)
 
     year = String.to_integer(year)
     month = String.to_integer(month)

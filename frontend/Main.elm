@@ -52,6 +52,54 @@ issuesDecoder =
   |> required "epic_name" string
   |> required "epic_link" string
 
+-- END SPRINT --
+type alias SprintEnd=
+  { title : String
+  , projectName : String
+  , sprintStart : String
+  , sprintEnd : String
+  , goal : String
+  , completedStories : List CompletedStory
+  , ongoingStories : List OngoingStory
+  }
+
+type alias CompletedStory =
+  { storyKey : String
+  , storyDesc : String
+  , storyLink : String
+  , storyStatus : String
+  , epicName : String
+  , epicLink : String
+  }
+
+type alias OngoingStory =
+  { storyKey : String
+  , storyDesc : String
+  , storyLink : String
+  , storyStatus : String
+  , epicName : String
+  , epicLink : String
+  }
+
+sprintEndDecoder =
+  decode SprintEnd
+  |> required "title" string
+  |> required "project_name" string
+  |> required "sprint_start" string
+  |> required "sprint_end" string
+  |> required "goal" string
+  |> required "completed_stories" (list storyDecoder)
+  |> required "ongoing_stories" (list storyDecoder)
+
+storyDecoder =
+  decode OngoingStory
+  |> required "story_key" string
+  |> required "story_desc" string
+  |> required "story_link" string
+  |> required "story_status" string
+  |> required "epic_name" string
+  |> required "epic_link" string
+
 type Msg
   = Decode (Result Http.Error String)
   | Username String
@@ -66,10 +114,11 @@ type alias Model =
   , password : String
   , storyKey : String
   , sprintStart : SprintStart
+  , sprintEnd : SprintEnd
   }
 
 init =
-  (Model "" "" "" "" (SprintStart "" "" "" "" "" []), Cmd.none)
+  (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []), Cmd.none)
 
 view model =
   case model.base64_key of
@@ -129,7 +178,7 @@ update msg model =
             , withCredentials = False
             }
 
-          command = Http.send Decode req |> Debug.log "hello"
+          command = Http.send Decode req
       in
       (model, command)
 
@@ -139,10 +188,13 @@ update msg model =
             case result of
               Ok json -> json
               Err msg -> toString(msg)
+  
 
-          result =  
+          data = Decode.decodeString sprintEndDecoder response 
+          |> Debug.log "data"
+
       in
-      (model, Cmd.none)
+      ({ model | sprint_end = data }, Cmd.none)
 
 subscriptions model =
   Sub.none
