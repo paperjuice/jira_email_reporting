@@ -114,6 +114,7 @@ defmodule EmailReport do
       end)
 
     result = %{
+      "sprint_type" => "end_sprint",
       "title" => "Sprint End Report (#{get_date(start_date)}) - #{project_name}",
       "project_name" => project_name,
       "sprint_start" => start_date,
@@ -148,6 +149,7 @@ defmodule EmailReport do
       end)
 
     result = %{
+      "sprint_type" => "start_sprint",
       "title" => "Sprint Start Report (#{get_date(start_date)}) - #{project_name}",
       "project_name" => project_name,
       "sprint_start" => start_date,

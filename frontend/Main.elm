@@ -34,6 +34,9 @@ type alias Issue =
   , epic_name : String
   , epic_link : String
   }
+type alias SprintType =
+  { sprint_type : String
+  }
 
 sprintStartDecoder =
   decode SprintStart
@@ -108,6 +111,12 @@ type Msg
   | SprintKey String
   | Generate
 
+type Screen
+  = Login
+  | EnterKey
+  | EndSprint
+  | StartSprint 
+
 type alias Model =
   { base64_key : String
   , username : String
@@ -115,36 +124,70 @@ type alias Model =
   , storyKey : String
   , sprintStart : SprintStart
   , sprintEnd : SprintEnd
+  , screen : Screen
   }
 
+------------------
+-- INIT
+------------------
 init =
-  (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []), Cmd.none)
+  (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []) Login, Cmd.none)
 
+------------------
+-- VIEW
+------------------
 view model =
-  case model.base64_key of
-    "" -> div [ ]
-             [ div [ ]
-                   [  span [ ] [ text "Username: " ]
-                   ,  input [ onInput Username ] [ ]
-                   ]
-             , div [ ]
-                   [ span [ ] [ text "Password: " ]
-                   , input [ type_ "Password", onInput Password ] [ ]
-                   ]
-             , br [ ] [ ]
-             , div [ ]
-                   [ button [ onClick Base64 ] [ text "Authenticate" ]
-                   ]
-             ]
-    _ -> div [ ]
-             [ div [ ] [ text "Add story-key from active sprint to generate Sprint Start Report" ]
-             , div [ ] [ text "Add story-key from closed sprint to generate Sprint End Report" ]
-             , div [ ]
-                   [ input [ placeholder "e.g. ABC-123", onInput SprintKey ] [ ] 
-                   ]
-             , button [ onClick Generate ] [ text "Generate" ]
-             ]
+  case model.screen of
+    Login -> viewLogin model
+    EnterKey -> viewEnterKey model
+    EndSprint -> viewEndSprint model
+    StartSprint -> viewStartSprint model
 
+
+viewLogin : Model -> Html Msg
+viewLogin model =
+  div [ ]
+      [ div [ ]
+            [  span [ ] [ text "Username: " ]
+            ,  input [ onInput Username ] [ ]
+            ]
+      , div [ ]
+            [ span [ ] [ text "Password: " ]
+            , input [ type_ "Password", onInput Password ] [ ]
+            ]
+      , br [ ] [ ]
+      , div [ ]
+            [ button [ onClick Base64 ] [ text "Authenticate" ]
+            ]
+      ]
+
+viewEnterKey : Model -> Html Msg
+viewEnterKey model =
+  div [ ]
+      [ div [ ] [ text "Add story-key from active sprint to generate Sprint Start Report" ]
+      , div [ ] [ text "Add story-key from closed sprint to generate Sprint End Report" ]
+      , div [ ]
+            [ input [ placeholder "e.g. ABC-123", onInput SprintKey ] [ ] 
+            ]
+      , button [ onClick Generate ] [ text "Generate" ]
+      ]
+
+viewEndSprint : Model -> Html msg
+viewEndSprint model =
+  div [ ]
+      [ 
+      ]
+
+viewStartSprint : Model -> Html msg
+viewStartSprint model =
+  div [ ]
+      [ 
+      ]
+
+
+------------------
+-- UPDATE
+------------------
 update msg model =
   case msg of
     Username string ->
@@ -160,7 +203,7 @@ update msg model =
       let
           encoded = Base64.encode (model.username ++ ":" ++ model.password)
       in
-      ({model | base64_key = encoded, username = "", password = "" }, Cmd.none)
+      ({model | base64_key = encoded, username = "", password = "", screen = EnterKey }, Cmd.none)
 
     Generate ->
       let
@@ -189,12 +232,13 @@ update msg model =
               Ok json -> json
               Err msg -> toString(msg)
   
-
           data = Decode.decodeString sprintEndDecoder response 
-          |> Debug.log "data"
+          resp = case data of
+            Ok data -> data
+            _ -> (SprintEnd "smthing's f**ked up :)" "" "" "" "" [] [])
 
       in
-      ({ model | sprint_end = data }, Cmd.none)
+      ({ model | sprintEnd = resp }, Cmd.none)
 
 subscriptions model =
   Sub.none
