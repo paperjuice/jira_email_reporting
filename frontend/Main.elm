@@ -18,6 +18,16 @@ main =
 
 url = "http://localhost:9999/email-report/"
 
+
+type alias SprintType =
+  { sprint_type : String
+  }
+
+sprintTypeDecoder =
+  decode SprintType
+  |> required "sprint_type" string
+
+-- START SPRINT --
 type alias SprintStart =
   { title : String
   , start : String
@@ -33,9 +43,6 @@ type alias Issue =
   , story_desc : String
   , epic_name : String
   , epic_link : String
-  }
-type alias SprintType =
-  { sprint_type : String
   }
 
 sprintStartDecoder =
@@ -114,8 +121,9 @@ type Msg
 type Screen
   = Login
   | EnterKey
-  | EndSprint
-  | StartSprint 
+  | SEnd
+  | SStart
+  | Error
 
 type alias Model =
   { base64_key : String
@@ -140,8 +148,9 @@ view model =
   case model.screen of
     Login -> viewLogin model
     EnterKey -> viewEnterKey model
-    EndSprint -> viewEndSprint model
-    StartSprint -> viewStartSprint model
+    SEnd -> viewEndSprint model
+    SStart -> viewStartSprint model
+    Error -> viewError model
 
 
 viewLogin : Model -> Html Msg
@@ -175,15 +184,20 @@ viewEnterKey model =
 viewEndSprint : Model -> Html msg
 viewEndSprint model =
   div [ ]
-      [ 
+      [ text "Sprint end"
       ]
 
 viewStartSprint : Model -> Html msg
 viewStartSprint model =
   div [ ]
-      [ 
+      [ text "Sprint start"
       ]
 
+viewError : Model -> Html msg
+viewError model =
+  div [ ]
+      [ text "Error"
+      ]
 
 ------------------
 -- UPDATE
@@ -232,13 +246,32 @@ update msg model =
               Ok json -> json
               Err msg -> toString(msg)
   
-          data = Decode.decodeString sprintEndDecoder response 
-          resp = case data of
-            Ok data -> data
-            _ -> (SprintEnd "smthing's f**ked up :)" "" "" "" "" [] [])
+          sType = 
+            case (Decode.decodeString sprintTypeDecoder response) of
+              Ok sprint_type -> sprint_type |> Debug.log "type"
+              _ -> SprintType "oups"
+
+          screen =
+            case sType.sprint_type of
+              "start_sprint" -> SStart
+              "end_sprint"   -> SEnd
+              _ -> Error
+
+          end =
+            case Decode.decodeString sprintEndDecoder response of
+              Ok data -> data
+              _       -> (SprintEnd "" "" "" "" "" [] [])
+
+          start =
+            case Decode.decodeString sprintStartDecoder response of
+              Ok data -> data
+              _       -> (SprintStart "" "" "" "" "" [])
 
       in
-      ({ model | sprintEnd = resp }, Cmd.none)
+      ({ model | sprintEnd = end,
+                 sprintStart = start,
+                 screen = screen
+      }, Cmd.none)
 
 subscriptions model =
   Sub.none

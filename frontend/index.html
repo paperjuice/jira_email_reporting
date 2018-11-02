@@ -9780,19 +9780,45 @@ var _truqu$elm_base64$Base64$encode = _truqu$elm_base64$Base64_Encode$encode;
 var _user$project$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
+var _user$project$Main$viewError = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Error'),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$Main$viewStartSprint = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		{ctor: '[]'});
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Sprint start'),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Main$viewEndSprint = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		{ctor: '[]'});
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Sprint end'),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Main$url = 'http://localhost:9999/email-report/';
+var _user$project$Main$SprintType = function (a) {
+	return {sprint_type: a};
+};
+var _user$project$Main$sprintTypeDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'sprint_type',
+	_elm_lang$core$Json_Decode$string,
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$SprintType));
 var _user$project$Main$SprintStart = F6(
 	function (a, b, c, d, e, f) {
 		return {title: a, start: b, sprint_goal: c, project_name: d, end: e, issues: f};
@@ -10097,17 +10123,20 @@ var _user$project$Main$view = function (model) {
 			return _user$project$Main$viewLogin(model);
 		case 'EnterKey':
 			return _user$project$Main$viewEnterKey(model);
-		case 'EndSprint':
+		case 'SEnd':
 			return _user$project$Main$viewEndSprint(model);
-		default:
+		case 'SStart':
 			return _user$project$Main$viewStartSprint(model);
+		default:
+			return _user$project$Main$viewError(model);
 	}
 };
 var _user$project$Main$Decode = function (a) {
 	return {ctor: 'Decode', _0: a};
 };
-var _user$project$Main$StartSprint = {ctor: 'StartSprint'};
-var _user$project$Main$EndSprint = {ctor: 'EndSprint'};
+var _user$project$Main$Error = {ctor: 'Error'};
+var _user$project$Main$SStart = {ctor: 'SStart'};
+var _user$project$Main$SEnd = {ctor: 'SEnd'};
 var _user$project$Main$EnterKey = {ctor: 'EnterKey'};
 var _user$project$Main$update = F2(
 	function (msg, model) {
@@ -10177,15 +10206,33 @@ var _user$project$Main$update = F2(
 						return _elm_lang$core$Basics$toString(_p2._0);
 					}
 				}();
-				var data = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Main$sprintEndDecoder, response);
-				var resp = function () {
-					var _p3 = data;
+				var sType = function () {
+					var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Main$sprintTypeDecoder, response);
 					if (_p3.ctor === 'Ok') {
-						return _p3._0;
+						return A2(_elm_lang$core$Debug$log, 'type', _p3._0);
+					} else {
+						return _user$project$Main$SprintType('oups');
+					}
+				}();
+				var screen = function () {
+					var _p4 = sType.sprint_type;
+					switch (_p4) {
+						case 'start_sprint':
+							return _user$project$Main$SStart;
+						case 'end_sprint':
+							return _user$project$Main$SEnd;
+						default:
+							return _user$project$Main$Error;
+					}
+				}();
+				var end = function () {
+					var _p5 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Main$sprintEndDecoder, response);
+					if (_p5.ctor === 'Ok') {
+						return _p5._0;
 					} else {
 						return A7(
 							_user$project$Main$SprintEnd,
-							'smthing\'s f**ked up :)',
+							'',
 							'',
 							'',
 							'',
@@ -10194,11 +10241,26 @@ var _user$project$Main$update = F2(
 							{ctor: '[]'});
 					}
 				}();
+				var start = function () {
+					var _p6 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Main$sprintStartDecoder, response);
+					if (_p6.ctor === 'Ok') {
+						return _p6._0;
+					} else {
+						return A6(
+							_user$project$Main$SprintStart,
+							'',
+							'',
+							'',
+							'',
+							'',
+							{ctor: '[]'});
+					}
+				}();
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{sprintEnd: resp}),
+						{sprintEnd: end, sprintStart: start, screen: screen}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
