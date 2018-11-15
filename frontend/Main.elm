@@ -1,6 +1,6 @@
-import Html exposing (div, span, Html, text, button, input, br)
+import Html exposing (div, span, Html, text, button, input, br, a)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, placeholder)
+import Html.Attributes exposing (type_, placeholder, class, href)
 import Base64
 import Http
 
@@ -18,7 +18,6 @@ main =
 
 url = "http://localhost:9999/email-report/"
 
-
 type alias SprintType =
   { sprint_type : String
   }
@@ -31,9 +30,9 @@ sprintTypeDecoder =
 type alias SprintStart =
   { title : String
   , start : String
+  , end : String
   , sprint_goal : String
   , project_name : String
-  , end : String
   , issues : List Issue
   }
 
@@ -48,17 +47,17 @@ type alias Issue =
 sprintStartDecoder =
   decode SprintStart
   |> required "title" string
-  |> required "project_name" string
   |> required "sprint_start" string
   |> required "sprint_end" string
   |> required "goal" string
+  |> required "project_name" string
   |> required "issues" (list issuesDecoder)
 
 issuesDecoder =
   decode Issue
+  |> required "story_link" string
   |> required "story_key" string
   |> required "story_desc" string
-  |> required "story_link" string
   |> required "epic_name" string
   |> required "epic_link" string
 
@@ -183,16 +182,49 @@ viewEnterKey model =
 
 viewEndSprint : Model -> Html msg
 viewEndSprint model =
-  div [ ]
-      [ text "Sprint end"
-      ]
+  let
+      sprintStart = model.sprintStart
+  in
+      div [ ]
+          [ div [ ] [ text "S" ]
+          , div [ ] [ ]
+          ]
 
 viewStartSprint : Model -> Html msg
 viewStartSprint model =
-  div [ ]
-      [ text "Sprint start"
-      ]
+  let
+      s = model.sprintStart
+      |> Debug.log "sSprint"
+  in
+      div [ ]
+          [ span [ class "s_start_1" ] [ text "Start: " ]
+          , span [ class "s_start_2" ] [ text s.start ]
+          , span [ class "s_end_1" ] [ text "End: " ]
+          , span [ class "s_end_2" ] [ text s.end ]
+          , div [ class "s_goal" ] [ text ("Sprint Goal: " ++ s.sprint_goal)]
+          , div [ class "s_comm_stories" ]
+                [ text "List of committed stories: " ]
+          , div [ ] (listOfCommitedStories s.issues)
+          ]
 
+listOfCommitedStories : List Issue -> List (Html msg)
+listOfCommitedStories issues =
+  List.map (\ issue -> 
+    div [ ]
+        [ span [ class "i_bp" ] [ text "*" ] 
+        , a [class "i_key", href issue.story_link ] [ text issue.story_key ]
+        , span [ class "i_desc" ] [ text ("| " ++ issue.story_desc ++ " | ") ]
+        , buildEpic issue.epic_link issue.epic_name
+        ]
+    ) issues
+
+buildEpic : String -> String -> Html msg
+buildEpic link name =
+  case (Debug.log "" name) of
+    "No Epic" -> span [ class "i_epic" ] [ text name ]
+    _ -> a [ class "i_epic", href link ] [ text name ]
+  
+    
 viewError : Model -> Html msg
 viewError model =
   div [ ]
