@@ -26,6 +26,6 @@ defmodule EmailReport.Router do
   end
 
   match _ do
-    send_resp(conn, 404, "That is some garbage I don't understand (╯°□°）╯︵ ┻━┻")
+    send_resp(conn, 404, "That is some garbage I don't understand.")
   end
 end

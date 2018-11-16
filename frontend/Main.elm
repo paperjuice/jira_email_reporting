@@ -1,8 +1,11 @@
-import Html exposing (div, span, Html, text, button, input, br, a)
-import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, placeholder, class, href)
+import Html.Styled exposing (div, span, Html, text, button, input, br, a, ul, li, toUnstyled)
 import Base64
 import Http
+
+import Css exposing (color, rgb)
+import Html
+import Html.Styled.Events exposing (onClick, onInput)
+import Html.Styled.Attributes exposing (type_, placeholder, class, href, css)
 
 import Json.Decode as Decode exposing (Decoder, int, string, list)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
@@ -12,7 +15,7 @@ main =
   Html.program
   { init = init
   , update = update
-  , view = view
+  , view = view >> toUnstyled
   , subscriptions = subscriptions
   }
 
@@ -64,30 +67,30 @@ issuesDecoder =
 -- END SPRINT --
 type alias SprintEnd=
   { title : String
-  , projectName : String
-  , sprintStart : String
-  , sprintEnd : String
-  , goal : String
-  , completedStories : List CompletedStory
-  , ongoingStories : List OngoingStory
+  , name : String
+  , start : String
+  , end : String
+  , sprint_goal : String
+  , completed_stories : List CompletedStory
+  , ongoing_stories : List OngoingStory
   }
 
 type alias CompletedStory =
-  { storyKey : String
-  , storyDesc : String
-  , storyLink : String
-  , storyStatus : String
-  , epicName : String
-  , epicLink : String
+  { story_key : String
+  , story_desc : String
+  , story_link : String
+  , story_status : String
+  , epic_name : String
+  , epic_link : String
   }
 
 type alias OngoingStory =
-  { storyKey : String
-  , storyDesc : String
-  , storyLink : String
-  , storyStatus : String
-  , epicName : String
-  , epicLink : String
+  { story_key : String
+  , story_desc : String
+  , story_link : String
+  , story_status : String
+  , epic_name : String
+  , epic_link : String
   }
 
 sprintEndDecoder =
@@ -140,6 +143,10 @@ type alias Model =
 init =
   (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []) Login, Cmd.none)
 
+------------------------------------------------------------------------
+--                         CSS
+------------------------------------------------------------------------
+
 ------------------
 -- VIEW
 ------------------
@@ -183,18 +190,51 @@ viewEnterKey model =
 viewEndSprint : Model -> Html msg
 viewEndSprint model =
   let
-      sprintStart = model.sprintStart
+      e = model.sprintEnd
   in
       div [ ]
-          [ div [ ] [ text "S" ]
-          , div [ ] [ ]
+          [ span [ class "e_start_1" ] [ text "Start: " ]
+          , span [ class "e_start_2" ] [ text e.start ]
+          , span [ class "e_end_1" ] [ text "End: " ]
+          , span [ class "e_end_2" ] [ text e.end ]
+          , div [ class "e_goal" ] [ text ("Sprint Goal: " ++ e.sprint_goal)]
+          , div [ class "e_comp_stories" ]
+                [ text "List of completed stories: " ]
+          , ul [ ] (listOfCompletedStories e.completed_stories )
+          , div [ class "e_ongoing_stories" ]
+                [ text "List of ongoing stories" ]
+          , ul [ ] (listOfOngoingStories e.ongoing_stories)
+          , div [ class "s_regards" ] [ text "Kind regards," ]
           ]
+
+listOfCompletedStories : List OngoingStory -> List (Html msg)
+listOfCompletedStories issues =
+ List.map(\ issue ->
+   li [ ]
+       [ a [class "i_key", href issue.story_link ] [ text issue.story_key ]
+       , span [ class "i_desc" ] [ text (" | " ++ issue.story_desc ++ " | ") ]
+       , buildEpic issue.epic_link issue.epic_name
+       , span [ class "i_status" ] [ text (" | " ++ issue.story_status) ]
+       ]
+   ) issues
+
+listOfOngoingStories : List OngoingStory -> List (Html msg)
+listOfOngoingStories issues =
+  case issues of
+    [] -> [ li [ ] [ text "All issues were completed!" ] ]
+    _  -> List.map(\ issue ->
+         li [ ]
+             [ a [class "i_key", href issue.story_link ] [ text issue.story_key ]
+             , span [ class "i_desc" ] [ text (" | " ++ issue.story_desc ++ " | ") ]
+             , buildEpic issue.epic_link issue.epic_name
+             , span [ class "i_status" ] [ text (" | " ++ issue.story_status) ]
+             ]
+         ) issues
 
 viewStartSprint : Model -> Html msg
 viewStartSprint model =
   let
       s = model.sprintStart
-      |> Debug.log "sSprint"
   in
       div [ ]
           [ span [ class "s_start_1" ] [ text "Start: " ]
@@ -204,7 +244,7 @@ viewStartSprint model =
           , div [ class "s_goal" ] [ text ("Sprint Goal: " ++ s.sprint_goal)]
           , div [ class "s_comm_stories" ]
                 [ text "List of committed stories: " ]
-          , div [ ] (listOfCommitedStories s.issues)
+          , ul [ ] (listOfCommitedStories s.issues)
           , div [ class "s_capacity" ] [ text "Capacity: " ]
           , div [ class "s_capacity_desc" ] [ text "All team members are available." ]
           , div [ class "s_risk" ] [ text "Risks: " ]
@@ -215,17 +255,16 @@ viewStartSprint model =
 listOfCommitedStories : List Issue -> List (Html msg)
 listOfCommitedStories issues =
   List.map (\ issue -> 
-    div [ ]
-        [ span [ class "i_bp" ] [ text "*" ] 
-        , a [class "i_key", href issue.story_link ] [ text issue.story_key ]
-        , span [ class "i_desc" ] [ text ("| " ++ issue.story_desc ++ " | ") ]
+    li [ ]
+        [ a [class "i_key", href issue.story_link ] [ text issue.story_key ]
+        , span [ class "i_desc" ] [ text (" | " ++ issue.story_desc ++ " | ") ]
         , buildEpic issue.epic_link issue.epic_name
         ]
     ) issues
 
 buildEpic : String -> String -> Html msg
 buildEpic link name =
-  case (Debug.log "" name) of
+  case name of
     "No Epic" -> span [ class "i_epic" ] [ text name ]
     _ -> a [ class "i_epic", href link ] [ text name ]
   
@@ -285,7 +324,7 @@ update msg model =
   
           sType = 
             case (Decode.decodeString sprintTypeDecoder response) of
-              Ok sprint_type -> sprint_type |> Debug.log "type"
+              Ok sprint_type -> sprint_type
               _ -> SprintType "oups"
 
           screen =
