@@ -205,6 +205,11 @@ viewStartSprint model =
           , div [ class "s_comm_stories" ]
                 [ text "List of committed stories: " ]
           , div [ ] (listOfCommitedStories s.issues)
+          , div [ class "s_capacity" ] [ text "Capacity: " ]
+          , div [ class "s_capacity_desc" ] [ text "All team members are available." ]
+          , div [ class "s_risk" ] [ text "Risks: " ]
+          , div [ class "s_risk_desc" ] [ text "No known risks." ]
+          , div [ class "s_regards" ] [ text "Kind regards," ]
           ]
 
 listOfCommitedStories : List Issue -> List (Html msg)
