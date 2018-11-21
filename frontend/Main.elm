@@ -1,15 +1,16 @@
-import Html.Styled exposing (div, span, Html, text, button, input, br, a, ul, li, toUnstyled)
+--port module Main exposing (main)
+import Html.Styled exposing (div, span, Html, text, button, input, br, a, ul, li, toUnstyled, img)
 import Base64
 import Http
-
 import Css exposing (color, rgb)
 import Html
 import Html.Styled.Events exposing (onClick, onInput)
-import Html.Styled.Attributes exposing (type_, placeholder, class, href, css)
+import Html.Styled.Attributes exposing (type_, placeholder, class, href, css, src, value, attribute, id)
 
 import Json.Decode as Decode exposing (Decoder, int, string, list)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 
+--port copy : String -> Cmd msg
 
 main =
   Html.program
@@ -20,6 +21,7 @@ main =
   }
 
 url = "http://localhost:9999/email-report/"
+emailAddresses = ""
 
 type alias SprintType =
   { sprint_type : String
@@ -119,6 +121,7 @@ type Msg
   | Base64
   | SprintKey String
   | Generate
+  | Back
 
 type Screen
   = Login
@@ -135,13 +138,14 @@ type alias Model =
   , sprintStart : SprintStart
   , sprintEnd : SprintEnd
   , screen : Screen
+  , loading : Bool
   }
 
 ------------------
 -- INIT
 ------------------
 init =
-  (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []) Login, Cmd.none)
+  (Model "" "" "" "" (SprintStart "" "" "" "" "" []) (SprintEnd "" "" "" "" "" [] []) Login False, Cmd.none)
 
 ------------------------------------------------------------------------
 --                         CSS
@@ -161,50 +165,78 @@ view model =
 
 viewLogin : Model -> Html Msg
 viewLogin model =
-  div [ ]
-      [ div [ ]
-            [  span [ ] [ text "Username: " ]
-            ,  input [ onInput Username ] [ ]
+  div [ class "login" ]
+      [ div [ ] 
+            [ img [ src "https://builderscollege.edu.in/wp-content/uploads/2016/11/EMAILICON.png" ]  [ ]
             ]
       , div [ ]
-            [ span [ ] [ text "Password: " ]
-            , input [ type_ "Password", onInput Password ] [ ]
+            [ input [ onInput Username, placeholder "Username", value model.username] [ ]
             ]
-      , br [ ] [ ]
       , div [ ]
+            [ input [ type_ "Password", onInput Password, placeholder "Password", value model.password ] [ ]
+            ]
+      , div [ class "login_button" ]
             [ button [ onClick Base64 ] [ text "Authenticate" ]
             ]
       ]
 
+viewLoadingIcon : Bool -> Html msg
+viewLoadingIcon loading =
+  if loading == True then
+    img [ class "loading", src "derivco_cat.svg"] [ ]
+  else
+    div [ ] [ ]
 viewEnterKey : Model -> Html Msg
 viewEnterKey model =
-  div [ ]
-      [ div [ ] [ text "Add story-key from active sprint to generate Sprint Start Report" ]
-      , div [ ] [ text "Add story-key from closed sprint to generate Sprint End Report" ]
-      , div [ ]
-            [ input [ placeholder "e.g. ABC-123", onInput SprintKey ] [ ] 
+  div [ class "enter_key" ]
+      [ div [ class "title" ] [ text "Steps to generate report" ]
+      , div [ class "step1"]
+            [ text "All you have to do is copy a story key (e.g. ABC-23) in the input field below."]
+      , div [ class "line"] [ ]
+      , div [ class "step2" ] [ text "For sprint start report, copy a story key from the current sprint."]
+      , div [ class "or" ] [ text "OR" ]
+      , div [ class "step3"] [ text "For sprint end report, copy a FINISHED story key from the ended sprint."]
+      , div [ class "key_input" ]
+            [ input [ placeholder "ABC-123", onInput SprintKey ] [ ] 
             ]
-      , button [ onClick Generate ] [ text "Generate" ]
+      , div [ class "generate_button" ]
+            [ button [ onClick Generate ] [ text "Generate" ]
+            ]
+      , viewLoadingIcon model.loading
       ]
 
-viewEndSprint : Model -> Html msg
+viewEndSprint : Model -> Html Msg
 viewEndSprint model =
   let
       e = model.sprintEnd
   in
-      div [ ]
-          [ span [ class "e_start_1" ] [ text "Start: " ]
-          , span [ class "e_start_2" ] [ text e.start ]
-          , span [ class "e_end_1" ] [ text "End: " ]
-          , span [ class "e_end_2" ] [ text e.end ]
-          , div [ class "e_goal" ] [ text ("Sprint Goal: " ++ e.sprint_goal)]
-          , div [ class "e_comp_stories" ]
-                [ text "List of completed stories: " ]
-          , ul [ ] (listOfCompletedStories e.completed_stories )
-          , div [ class "e_ongoing_stories" ]
-                [ text "List of ongoing stories" ]
-          , ul [ ] (listOfOngoingStories e.ongoing_stories)
-          , div [ class "s_regards" ] [ text "Kind regards," ]
+      div []
+          [ div [ class "generated" ] [ text "Generated Sprint End report" ]
+          , div [ class "back", onClick Back ] [ text "<"]
+          , div [ class "e", id "copy" ] 
+                [ span [ class "e_start_1" ] [ text "Start: " ]
+                , span [ class "e_start_2" ] [ text (e.start ++ " |") ]
+                , span [ class "e_end_1" ] [ text "  End: " ]
+                , span [ class "e_end_2" ] [ text e.end ]
+                , div [ ] [ ]
+                , span [ class "e_goal" ] [ text "Sprint Goal: "] 
+                , span [ ] [ text e.sprint_goal]
+                , br [ ] [ ]
+                , br [ ] [ ]
+                , div [ class "e_comp_stories" ]
+                      [ text "List of completed stories: " ]
+                , ul [ ] (listOfCompletedStories e.completed_stories )
+                , br [ ] [ ]
+                , div [ class "e_ongoing_stories" ]
+                      [ text "List of not completed stories" ]
+                , ul [ ] (listOfOngoingStories e.ongoing_stories)
+                , br [ ] [ ]
+                , br [ ] [ ]
+                , div [ class "regards" ] [ text "Kind regards," ]
+                ]
+          , div [ class "mail-to" ]
+                [ a [ class "button", id "mailto", href ("mailto:" ++ emailAddresses ++ "?subject=" ++ e.title), attribute "data-clipboard-target" "#copy" ] [ text "Open e-mail :)" ] 
+                ]
           ]
 
 listOfCompletedStories : List OngoingStory -> List (Html msg)
@@ -231,25 +263,40 @@ listOfOngoingStories issues =
              ]
          ) issues
 
-viewStartSprint : Model -> Html msg
+viewStartSprint : Model -> Html Msg
 viewStartSprint model =
   let
       s = model.sprintStart
   in
       div [ ]
-          [ span [ class "s_start_1" ] [ text "Start: " ]
-          , span [ class "s_start_2" ] [ text s.start ]
-          , span [ class "s_end_1" ] [ text "End: " ]
-          , span [ class "s_end_2" ] [ text s.end ]
-          , div [ class "s_goal" ] [ text ("Sprint Goal: " ++ s.sprint_goal)]
-          , div [ class "s_comm_stories" ]
-                [ text "List of committed stories: " ]
-          , ul [ ] (listOfCommitedStories s.issues)
-          , div [ class "s_capacity" ] [ text "Capacity: " ]
-          , div [ class "s_capacity_desc" ] [ text "All team members are available." ]
-          , div [ class "s_risk" ] [ text "Risks: " ]
-          , div [ class "s_risk_desc" ] [ text "No known risks." ]
-          , div [ class "s_regards" ] [ text "Kind regards," ]
+          [ div [ class "generated" ] [ text "Generated Sprint Start report" ]
+          , div [ class "back", onClick Back ] [ text "<"]
+          , div [ class "e", id "copy"] 
+                [ span [ class "e_start_1" ] [ text "Start: " ]
+                , span [ class "e_start_2" ] [ text (s.start ++ " |")]
+                , span [ class "e_end_1" ] [ text " End: " ]
+                , span [ class "e_end_2" ] [ text s.end ]
+                , div [ ] [ ]
+                , span [ class "e_goal" ] [ text "Sprint Goal: "] 
+                , span [ ] [ text s.sprint_goal]
+                , br [ ] [ ]
+                , br [ ] [ ]
+                , div [ class "e_comp_stories" ]
+                      [ text "List of committed stories: " ]
+                , ul [ ] (listOfCommitedStories s.issues)
+                , br [ ] [ ]
+                , div [ class "capacity" ] [ text "Capacity: " ]
+                , div [ class "capacity_desc" ] [ text "All team members are available." ]
+                , br [ ] [ ]
+                , div [ class "risk" ] [ text "Risks: " ]
+                , div [ class "risk_desc" ] [ text "No known risks." ]
+                , br [ ] [ ]
+                , br [ ] [ ]
+                , div [ class "regards" ] [ text "Kind regards," ]
+                ]
+          , div [ class "mail-to" ]
+                [ a [ class "button", id "mailto", href ("mailto:" ++ emailAddresses ++ "?subject=" ++ s.title), attribute "data-clipboard-target" "#copy" ] [ text "Open e-mail :)" ] 
+                ]
           ]
 
 listOfCommitedStories : List Issue -> List (Html msg)
@@ -271,8 +318,13 @@ buildEpic link name =
     
 viewError : Model -> Html msg
 viewError model =
-  div [ ]
-      [ text "Error"
+  div [ class "error"]
+      [ div [ class "e1" ] [ text "Oh no, stuff's broken :("]
+      , div [ class "e2" ] [ text "Make sure your password is correct." ]
+      , div [ class "e2" ] [ text "Make sure your password is not expired." ]
+      , div [ class "e3" ] [ text "Make sure Jira is not locked behind CAPCHA. Pop on the JIRA's login page and try to log in." ]
+      , div [ class "e3" ] [ text "Make sure your key exist." ]
+      , div [ class "e2" ] [ text "Sometimes you can get timeouts from JIRA." ]
       ]
 
 ------------------
@@ -280,6 +332,8 @@ viewError model =
 ------------------
 update msg model =
   case msg of
+    Back ->
+      ( {model | screen = EnterKey}, Cmd.none)
     Username string ->
       ({ model | username = string }, Cmd.none )
 
@@ -313,7 +367,7 @@ update msg model =
 
           command = Http.send Decode req
       in
-      (model, command)
+      ({model | loading = True}, command)
 
     Decode result ->
       let
@@ -346,8 +400,9 @@ update msg model =
       in
       ({ model | sprintEnd = end,
                  sprintStart = start,
-                 screen = screen
+                 screen = screen,
+                 loading = False
       }, Cmd.none)
-
+      
 subscriptions model =
   Sub.none

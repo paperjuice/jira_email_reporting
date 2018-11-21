@@ -81,6 +81,8 @@ defmodule EmailReport do
          end_date,
          goal
        ) do
+    project_name_escaped = String.replace(project_name, "&", "and")
+
     completed_stories =
       issues
       |> Enum.filter(fn issue ->
@@ -115,7 +117,7 @@ defmodule EmailReport do
 
     result = %{
       "sprint_type" => "end_sprint",
-      "title" => "Sprint End Report (#{get_date(start_date)}) - #{project_name}",
+      "title" => "Sprint End Report (#{get_date(start_date)}) - #{project_name_escaped}",
       "project_name" => project_name,
       "sprint_start" => start_date,
       "sprint_end" => end_date,
@@ -137,6 +139,8 @@ defmodule EmailReport do
          end_date,
          goal
        ) do
+
+    project_name_escaped = String.replace(project_name, "&", "and")
     active_data =
       Enum.map(issues, fn issue ->
         %{
@@ -150,7 +154,7 @@ defmodule EmailReport do
 
     result = %{
       "sprint_type" => "start_sprint",
-      "title" => "Sprint Start Report (#{get_date(start_date)}) - #{project_name}",
+      "title" => "Sprint Start Report (#{get_date(start_date)}) - #{project_name_escaped}",
       "project_name" => project_name,
       "sprint_start" => start_date,
       "sprint_end" => end_date,

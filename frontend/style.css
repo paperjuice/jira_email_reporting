@@ -1,4 +1,236 @@
-.s_regards {
-  margin: 10px;
-  color: red;
+:root{
+  --bg-color: #262024;
+  --t-color-i: #F0442D; 
+  --t-color-ii: #9D959A;
+  --t-color-iii: #7B7177;
+}
+
+html {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+}
+
+.login {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.login img {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+
+  margin-bottom: 60px;
+}
+.login input{
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.login .login_button button {
+  margin-top: 20px;
+  width: 100px;
+  height: 30px;
+  border-style: none;
+  background-color: var(--t-color-i);
+  border-radius: 2px;
+  color: white;
+  transition: 0.5s;
+}
+.login .login_button button:hover {
+  border-radius: 4px;
+  width: 110px;
+}
+
+.enter_key {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.enter_key .title {
+  color: #fff;
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.enter_key .step1{
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.enter_key .line {
+  width: 100%;
+  height: 1px;
+  background-color: var(--t-color-i);
+  margin-bottom: 30px;
+}
+
+.enter_key .step1,
+.enter_key .step2,
+.enter_key .step3{
+  color: #eee;
+}
+.enter_key .or{
+  color: var(--t-color-i);
+}
+.enter_key .step2,
+.enter_key .or,
+.enter_key .step3{
+  text-align: center;
+}
+
+.enter_key .key_input input {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 50px;
+  text-align: center;
+}
+
+.enter_key .generate_button button{
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 20px;
+
+  width: 70px;
+  height: 30px;
+  border-style: none;
+  background-color: var(--t-color-i);
+  border-radius: 2px;
+  color: white;
+  transition: 0.5s;
+}
+.enter_key .generate_button button:hover{
+  border-radius: 4px;
+  width: 80px;
+}
+input {
+  width: 150px;
+  height: 30px;
+  margin-top: 5px;
+  border-radius: 2px;
+  border-style: none;
+  font-size: 14px;
+  color: var(--bg-color);
+}
+.login_button {
+  position: relative;
+  align-self: center;
+}
+.generated {
+  margin-top: 20px;
+  color: #fff;
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.mail-to {
+  position: relative;
+  margin-top: 30px;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+
+  height: 30px;
+  background-color: var(--t-color-i);
+  width: 120px;
+  border-radius: 2px;
+  color: white;
+  transition: 0.5s;
+}
+.mail-to:hover {
+  border-radius: 4px;
+  width: 130px;
+}
+.mail-to .button {
+  margin: 0px;
+  padding: 0px;
+
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  text-decoration: none;
+  color: white;
+}
+
+.e{
+  background-color: white;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.e_start_1 {
+  margin-top: 20px;
+}
+.e_start_1,
+.e_end_1,
+.e_goal{
+  font-weight: bold;
+}
+.e_end_1 {
+  margin-left: 10px;
+}
+.e_comp_stories ,
+.e_ongoing_stories {
+  font-size: 18px;
+}
+
+.capacity,
+.risk{
+  font-weight: bold;
+}
+.loading {
+  width: 160px;
+  margin: 20px auto auto auto;
+}
+
+.error{
+  margin-left: 30px;
+  min-width: 300px;
+  max-width: 600px;
+}
+.e1 {
+  color: #fff;
+  font-size: 32px;
+  text-align: center;
+  margin:80px 0 40px 0;
+}
+.e2,.e3{
+  color: white;
+}
+.back{
+  width: 30px;
+  height: 30px;
+  background-color: var(--t-color-i);
+  position: fixed;
+  left: 10px;
+  top: 20px;
+  color: white;  
+  text-align: center;
+  line-height: 30px;
+  border-radius: 2px;
+  transition: 0.5s;
+}
+.back:hover{
+  border-radius: 4px;
+  width: 40px;
+  cursor: pointer;
 }
